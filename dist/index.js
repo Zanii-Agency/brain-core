@@ -10,4 +10,5 @@
 export { splitForCache } from "./prompt-cache.js";
 export { runClaude } from "./claude-client.js";
 export { isAmbiguousReference, isCapabilityQuestion, isHedge, isHedgeLoop } from "./intent-detect.js";
+export { makeCompletionGuard, makeSendGuard, makeStagingGuard, makeSympathyGuard } from "./honesty-guards.js";
 //# sourceMappingURL=index.js.map
