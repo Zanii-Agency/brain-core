@@ -44,6 +44,12 @@ export function makeCompletionGuard(config) {
             ? ranSuccessfully(toolRuns, config.globalReadExemptTools)
             : false;
         // Per-shape checks: if a shape matches, the backing tool must satisfy it.
+        // NOTE: globalReadExempt is intentionally NOT checked per-shape — Sasa's
+        // money-shape policy explicitly fires even when list_tasks ran (because a
+        // money claim with no record_payment is wrong regardless of what else ran).
+        // globalReadExempt only saves the generic catch-all from narration false
+        // positives like "I've noted your open tasks: 1. Mark's case" where the
+        // case-shape word came from list_tasks narration, not a real action claim.
         for (const shape of config.shapes) {
             if (!shape.regex.test(reply))
                 continue;
@@ -52,8 +58,6 @@ export function makeCompletionGuard(config) {
             if (shape.readTools && ranSuccessfully(toolRuns, shape.readTools))
                 continue;
             if (shape.parseTasksExempt && parseTasksDidIt)
-                continue;
-            if (globalReadExempt)
                 continue;
             return true; // matched a shape but nothing backs it
         }
