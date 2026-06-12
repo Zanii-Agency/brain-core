@@ -8,4 +8,5 @@
 // from Sasa's runSasa, arch2 c8e510f). Subsequent versions add the
 // Anthropic client wrapper, tool dispatch loop, and honesty guards.
 export { splitForCache } from "./prompt-cache.js";
+export { runClaude } from "./claude-client.js";
 //# sourceMappingURL=index.js.map
