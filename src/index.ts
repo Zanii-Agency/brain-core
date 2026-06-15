@@ -26,3 +26,15 @@ export type {
   StagingGuardConfig,
   SympathyGuardConfig,
 } from "./honesty-guards.js";
+
+// v0.6 (2026-06-16): schema-drift detector. See schema-guard.ts header for
+// the 2026-06-15 Sasa cascade that motivated this.
+export { checkSchema, formatSchemaResult } from "./schema-guard.js";
+export type {
+  SchemaManifest,
+  SchemaMissing,
+  SchemaDriftCode,
+  SchemaCheckResult,
+  SchemaCheckDb,
+  SchemaCheckOpts,
+} from "./schema-guard.js";
