@@ -14,4 +14,9 @@ export { makeCompletionGuard, makeSendGuard, makeStagingGuard, makeSympathyGuard
 // v0.6 (2026-06-16): schema-drift detector. See schema-guard.ts header for
 // the 2026-06-15 Sasa cascade that motivated this.
 export { checkSchema, formatSchemaResult } from "./schema-guard.js";
+// v0.7 (2026-06-16): cross-bot tool registry. discriminatorMismatch lifted
+// from Sasa (smart-tools.ts) and Jensen (concierge/dispatch.ts) as the first
+// proof of the adapter pattern. See tool-registry.ts + discriminator.ts.
+export { discriminatorMismatch } from "./discriminator.js";
+export { register, list, get, _resetForTest } from "./tool-registry.js";
 //# sourceMappingURL=index.js.map

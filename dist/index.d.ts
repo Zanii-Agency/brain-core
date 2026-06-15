@@ -8,4 +8,8 @@ export { makeCompletionGuard, makeSendGuard, makeStagingGuard, makeSympathyGuard
 export type { ToolRun, CompletionShape, CompletionGuardConfig, SendGuardConfig, StagingGuardConfig, SympathyGuardConfig, } from "./honesty-guards.js";
 export { checkSchema, formatSchemaResult } from "./schema-guard.js";
 export type { SchemaManifest, SchemaMissing, SchemaDriftCode, SchemaCheckResult, SchemaCheckDb, SchemaCheckOpts, } from "./schema-guard.js";
+export { discriminatorMismatch } from "./discriminator.js";
+export type { DiscriminatorAdapters, DiscriminatorResult, } from "./discriminator.js";
+export { register, list, get, _resetForTest } from "./tool-registry.js";
+export type { ToolPrimitive, ToolPrimitiveCategory, } from "./tool-registry.js";
 //# sourceMappingURL=index.d.ts.map

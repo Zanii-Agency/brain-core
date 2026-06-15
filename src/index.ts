@@ -38,3 +38,18 @@ export type {
   SchemaCheckDb,
   SchemaCheckOpts,
 } from "./schema-guard.js";
+
+// v0.7 (2026-06-16): cross-bot tool registry. discriminatorMismatch lifted
+// from Sasa (smart-tools.ts) and Jensen (concierge/dispatch.ts) as the first
+// proof of the adapter pattern. See tool-registry.ts + discriminator.ts.
+export { discriminatorMismatch } from "./discriminator.js";
+export type {
+  DiscriminatorAdapters,
+  DiscriminatorResult,
+} from "./discriminator.js";
+
+export { register, list, get, _resetForTest } from "./tool-registry.js";
+export type {
+  ToolPrimitive,
+  ToolPrimitiveCategory,
+} from "./tool-registry.js";
