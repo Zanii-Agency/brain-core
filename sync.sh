@@ -64,9 +64,11 @@ for T in "${TARGETS[@]}"; do
   # Brain-core target dirs do not exist yet on first sync — create them.
   mkdir -p "$T"
   echo "→ syncing → $T"
-  for f in $(ls dist/); do
-    rm -f "$T/$f"
-  done
+  # Remove ALL files in target to prevent stale files from lingering.
+  # This catches files that were removed from the source but still exist
+  # in the target (e.g., webhook-guard.js from a prior manual addition).
+  rm -f "$T"/*.{js,d.ts,js.map,d.ts.map} 2>/dev/null || true
+  rm -f "$T/VERSION" 2>/dev/null || true
   cp -R dist/. "$T/"
   REMOTE_HASH=$(
     find "$T" -maxdepth 1 -type f \( -name "*.js" -o -name "*.d.ts" \) -not -name "*.map" \
