@@ -62,3 +62,14 @@ export type {
   WebhookGuardAction,
   WebhookGuardAdapters,
 } from "./webhook-guard.js";
+
+// v0.9 (2026-06-17): send chokepoint with audit logging. Unified primitive
+// for Law 2 — every outbound message passes through a single door where
+// sanitization, dev-routing, and audit logging happen. Adapter provides
+// persistence shape, dev phone, and send function.
+export { sendWithAudit } from "./send-chokepoint.js";
+export type {
+  SendChokepointAction,
+  SendChokepointAdapters,
+  SendChokepointOpts,
+} from "./send-chokepoint.js";

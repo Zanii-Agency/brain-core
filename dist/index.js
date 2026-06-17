@@ -23,4 +23,9 @@ export { register, list, get, _resetForTest } from "./tool-registry.js";
 // against Meta duplicate webhooks and split image+text deliveries.
 // Lifted from Jensen's route.ts. See webhook-guard.ts header for KT #302.
 export { shouldProcess, mediaArrived, _resetForTest as _resetWebhookGuard } from "./webhook-guard.js";
+// v0.9 (2026-06-17): send chokepoint with audit logging. Unified primitive
+// for Law 2 — every outbound message passes through a single door where
+// sanitization, dev-routing, and audit logging happen. Adapter provides
+// persistence shape, dev phone, and send function.
+export { sendWithAudit } from "./send-chokepoint.js";
 //# sourceMappingURL=index.js.map
