@@ -53,3 +53,12 @@ export type {
   ToolPrimitive,
   ToolPrimitiveCategory,
 } from "./tool-registry.js";
+
+// v0.8 (2026-06-16): webhook dedup + media-pending buffer. Cross-bot guard
+// against Meta duplicate webhooks and split image+text deliveries.
+// Lifted from Jensen's route.ts. See webhook-guard.ts header for KT #302.
+export { shouldProcess, mediaArrived, _resetForTest as _resetWebhookGuard } from "./webhook-guard.js";
+export type {
+  WebhookGuardAction,
+  WebhookGuardAdapters,
+} from "./webhook-guard.js";

@@ -12,4 +12,6 @@ export { discriminatorMismatch } from "./discriminator.js";
 export type { DiscriminatorAdapters, DiscriminatorResult, } from "./discriminator.js";
 export { register, list, get, _resetForTest } from "./tool-registry.js";
 export type { ToolPrimitive, ToolPrimitiveCategory, } from "./tool-registry.js";
+export { shouldProcess, mediaArrived, _resetForTest as _resetWebhookGuard } from "./webhook-guard.js";
+export type { WebhookGuardAction, WebhookGuardAdapters, } from "./webhook-guard.js";
 //# sourceMappingURL=index.d.ts.map

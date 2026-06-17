@@ -1,5 +1,5 @@
 package: @sinanagency/brain-core
-version: 0.7.0
-git_sha: d172c69
-built_at: 2026-06-15T22:49:46Z
-content_hash: a85417073cf600666de9ddfd45106621
+version: 0.8.0
+git_sha: 73ab9f1
+built_at: 2026-06-16T21:43:34Z
+content_hash: 2d0f960b69623a9cd06a5f15e52aec9d
