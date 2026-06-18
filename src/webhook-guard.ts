@@ -20,6 +20,8 @@ export type WebhookGuardAction =
 export type WebhookGuardAdapters = {
   seenByWamid: (wamid: string) => Promise<boolean>;
   logToChat: (sender: string, text: string) => Promise<void>;
+  /** Optional cross-instance lock. Return false to skip (another instance is processing). */
+  acquireLock?: (key: string, ttlMs: number) => Promise<boolean>;
 };
 
 const PROCESSING_LOCKS = new Map<string, number>();
@@ -45,13 +47,24 @@ export async function shouldProcess(
 
   const now = Date.now();
   const lockKey = `${adapterName}::${sender}`;
-  const lastSeen = PROCESSING_LOCKS.get(lockKey);
-  if (lastSeen !== undefined && now - lastSeen < 2000) {
-    if (text) await adapters.logToChat(sender, text).catch(() => {});
-    return { action: "skip", reason: "concurrent_duplicate" };
-  }
-  PROCESSING_LOCKS.set(lockKey, now);
 
+  // Try optional cross-instance lock first. If another Vercel instance holds
+  // the lock, skip (same as the in-process guard below).
+  if (adapters.acquireLock) {
+    const acquired = await adapters.acquireLock(lockKey, 4000);
+    if (!acquired) {
+      if (text) await adapters.logToChat(sender, text).catch(() => {});
+      return { action: "skip", reason: "concurrent_duplicate" };
+    }
+  }
+
+  // Media-pending buffer: if the inbound looks like a media reference
+  // ("this", "here", "see attached"), wait briefly for a media webhook
+  // to arrive from the same sender before releasing. The 2s sender-lock
+  // runs AFTER this block so the media webhook is not blocked by the
+  // text webhook's lock (June 18 bug: lock before buffer made the
+  // entire media-pending path non-functional because the image arrived
+  // while the text held the lock).
   if (text && resolveMediaRef(text)) {
     MEDIA_PENDING.set(sender, { text, ts: now });
     let timedOut = false;
@@ -73,6 +86,16 @@ export async function shouldProcess(
     if (timedOut) return { action: "process" };
     return { action: "skip", reason: "merged_with_media" };
   }
+
+  // Per-sender lock: prevents two webhooks for the same sender within 2s
+  // from both being processed (Meta batch behaviour). The lock lives AFTER
+  // the media buffer so image webhooks are not blocked by the text lock.
+  const lastSeen = PROCESSING_LOCKS.get(lockKey);
+  if (lastSeen !== undefined && now - lastSeen < 2000) {
+    if (text) await adapters.logToChat(sender, text).catch(() => {});
+    return { action: "skip", reason: "concurrent_duplicate" };
+  }
+  PROCESSING_LOCKS.set(lockKey, now);
 
   return { action: "process" };
 }
