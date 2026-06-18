@@ -23,11 +23,16 @@ export async function sendWithAudit(to, body, adapters, opts) {
             return { ok: false, error: res.error };
         return { ok: true, id: res.id ?? null };
     }
-    // 2) Persist BEFORE send (Law 2: write before send, prevents orphan on failure)
+    // 2) Persist BEFORE send (Law 2: write before send, prevents orphan on failure).
+    //    If persist fails we DO NOT send: an undeduplicated/unlogged outbound is
+    //    worse than a dropped one — it cannot be reconciled post-mortem.
     const persisted = await adapters.persistOutbound(to, body, {
         party: opts?.party,
         trace_id: opts?.trace_id,
     });
+    if (persisted.error) {
+        return { ok: false, error: `persist failed before send: ${persisted.error}` };
+    }
     // 3) Send via WhatsApp API
     const sendRes = await adapters.sendFn(to, body, { force: opts?.force });
     // 4) Return combined result
