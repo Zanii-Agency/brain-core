@@ -1,6 +1,6 @@
 {
   "name": "@sinanagency/brain-core",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "description": "Shared brain engine for sinanagency bots. Empty machinery — model client, tool dispatch, honesty guards, prompt cache split, persona scaffold. Each Adapter brings its own tools, persona, DB, and audience rules. The package itself ships zero tenant-specific knowledge.",
   "type": "module",
