@@ -24,6 +24,14 @@ export type WebhookGuardAdapters = {
   acquireLock?: (key: string, ttlMs: number) => Promise<boolean>;
 };
 
+export type WebhookGuardOpts = {
+  /** True when the inbound webhook carries an actual media file (image, document,
+   *  video, audio/voice, sticker). Media is EXEMPT from the per-sender 2s lock and
+   *  the media-pending buffer so distinct images sent seconds apart are never
+   *  dropped as duplicates. */
+  hasMedia?: boolean;
+};
+
 const PROCESSING_LOCKS = new Map<string, number>();
 const MEDIA_PENDING = new Map<string, { text: string; ts: number }>();
 const MEDIA_WAIT_MS = 2500;
@@ -39,12 +47,22 @@ export async function shouldProcess(
   wamid: string | null | undefined,
   text: string | null | undefined,
   adapters: WebhookGuardAdapters,
+  opts?: WebhookGuardOpts,
 ): Promise<WebhookGuardAction> {
   if (wamid) {
     const seen = await adapters.seenByWamid(wamid);
     if (seen) return { action: "skip", reason: "duplicate_wamid" };
   }
 
+  // A message that actually CARRIES media must never enter the media-pending
+  // buffer or the per-sender lock below. The buffer exists to hold a SHORT TEXT
+  // reference ("here", "see attached") until the image webhook lands; the lock
+  // exists to drop rapid duplicate TEXT webhooks. Distinct images each carry a
+  // distinct wamid, so the wamid dedup at the top already rejects a genuine
+  // re-delivery of the SAME image. For media, the lock/buffer add nothing but
+  // the drop (Stalia, 2026-09-01: a portal screenshot then the real bank proof
+  // arrived within 2s; the second was skipped as a duplicate and lost).
+  const carriesMedia = Boolean(opts && opts.hasMedia);
   const now = Date.now();
   const lockKey = `${adapterName}::${sender}`;
 
@@ -65,7 +83,7 @@ export async function shouldProcess(
   // text webhook's lock (June 18 bug: lock before buffer made the
   // entire media-pending path non-functional because the image arrived
   // while the text held the lock).
-  if (text && resolveMediaRef(text)) {
+  if (!carriesMedia && text && resolveMediaRef(text)) {
     MEDIA_PENDING.set(sender, { text, ts: now });
     let timedOut = false;
     await new Promise<void>((resolve) => {
@@ -88,14 +106,19 @@ export async function shouldProcess(
   }
 
   // Per-sender lock: prevents two webhooks for the same sender within 2s
-  // from both being processed (Meta batch behaviour). The lock lives AFTER
-  // the media buffer so image webhooks are not blocked by the text lock.
-  const lastSeen = PROCESSING_LOCKS.get(lockKey);
-  if (lastSeen !== undefined && now - lastSeen < 2000) {
-    if (text) await adapters.logToChat(sender, text).catch(() => {});
-    return { action: "skip", reason: "concurrent_duplicate" };
+  // from both being processed (Meta batch behaviour). MEDIA IS EXEMPT (see the
+  // carriesMedia note above): two distinct images sent within 2s each have a
+  // distinct wamid, so the wamid dedup already catches a true re-delivery; the
+  // lock here would only drop the second distinct image. So it guards non-media
+  // (rapid duplicate text webhooks) alone.
+  if (!carriesMedia) {
+    const lastSeen = PROCESSING_LOCKS.get(lockKey);
+    if (lastSeen !== undefined && now - lastSeen < 2000) {
+      if (text) await adapters.logToChat(sender, text).catch(() => {});
+      return { action: "skip", reason: "concurrent_duplicate" };
+    }
+    PROCESSING_LOCKS.set(lockKey, now);
   }
-  PROCESSING_LOCKS.set(lockKey, now);
 
   return { action: "process" };
 }
