@@ -18,6 +18,9 @@ export interface RunClaudeOpts {
     tools: any[];
     /** Max output tokens (default 1400). */
     maxTokens?: number;
+    /** Sampling temperature. Omit to let the Adapter/API default stand; grounded
+     *  ops bots should pass a low value (0 for classification, ~0.3 for prose). */
+    temperature?: number;
     /** Retry attempts on 429/529 (default 4). */
     maxAttempts?: number;
     /** Optional hook fired once all retries are exhausted with the final error. */
@@ -28,6 +31,7 @@ export interface RunClaudeOpts {
         call: (args: {
             model: string;
             max_tokens: number;
+            temperature?: number;
             system: string;
             tools: any[];
             messages: any[];
