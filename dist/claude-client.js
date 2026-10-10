@@ -47,6 +47,7 @@ export async function runClaude(opts) {
         const resp = await opts.gym.call({
             model: opts.model,
             max_tokens: maxTokens,
+            ...(opts.temperature != null ? { temperature: opts.temperature } : {}),
             system: systemText,
             tools: opts.tools,
             messages: opts.messages,
@@ -65,6 +66,7 @@ export async function runClaude(opts) {
     const body = JSON.stringify({
         model: opts.model,
         max_tokens: maxTokens,
+        ...(opts.temperature != null ? { temperature: opts.temperature } : {}),
         system: cachedSystem,
         tools: cachedTools,
         messages: opts.messages,

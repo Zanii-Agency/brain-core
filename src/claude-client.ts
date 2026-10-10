@@ -48,6 +48,9 @@ export interface RunClaudeOpts {
   tools: any[];
   /** Max output tokens (default 1400). */
   maxTokens?: number;
+  /** Sampling temperature. Omit to let the Adapter/API default stand; grounded
+   *  ops bots should pass a low value (0 for classification, ~0.3 for prose). */
+  temperature?: number;
   /** Retry attempts on 429/529 (default 4). */
   maxAttempts?: number;
   /** Optional hook fired once all retries are exhausted with the final error. */
@@ -55,7 +58,7 @@ export interface RunClaudeOpts {
   /** Optional eval-mode gym swap. brain-core calls gym.call(args) when gym.active() is true. */
   gym?: {
     active: () => boolean;
-    call: (args: { model: string; max_tokens: number; system: string; tools: any[]; messages: any[] }) => Promise<any>;
+    call: (args: { model: string; max_tokens: number; temperature?: number; system: string; tools: any[]; messages: any[] }) => Promise<any>;
   };
 }
 
@@ -81,6 +84,7 @@ export async function runClaude(opts: RunClaudeOpts): Promise<any> {
     const resp = await opts.gym.call({
       model: opts.model,
       max_tokens: maxTokens,
+      ...(opts.temperature != null ? { temperature: opts.temperature } : {}),
       system: systemText,
       tools: opts.tools,
       messages: opts.messages,
@@ -100,6 +104,7 @@ export async function runClaude(opts: RunClaudeOpts): Promise<any> {
   const body = JSON.stringify({
     model: opts.model,
     max_tokens: maxTokens,
+    ...(opts.temperature != null ? { temperature: opts.temperature } : {}),
     system: cachedSystem,
     tools: cachedTools,
     messages: opts.messages,
