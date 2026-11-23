@@ -1,6 +1,6 @@
-# @sinanagency/brain-core
+# @zanii/brain-core
 
-The shared brain engine every sinanagency bot calls. Empty machinery — same shape as `@sinanagency/bot-guards`, one layer up.
+The shared brain engine every Zanii bot calls. Empty machinery — same shape as `@zanii/bot-guards`, one layer up.
 
 **Status:** v0.1 spec phase. Code extraction from Sasa pending.
 
@@ -10,14 +10,14 @@ The shared brain engine every sinanagency bot calls. Empty machinery — same sh
 INPUT (text · voice · doc · image · reaction · quote · @mention)
     │
     ▼
-[ Intake ]            ← @sinanagency/intake (separate package)
+[ Intake ]            ← @zanii/intake (separate package)
     │
     ▼
 [ Brain Core ]        ← THIS PACKAGE
     │  model client · tool dispatch · honesty guards
     │  completion guards · prompt cache split · persona scaffold
     ▼
-[ Wall ]              ← @sinanagency/bot-guards (already shipped)
+[ Wall ]              ← @zanii/bot-guards (already shipped)
     │  sanitizeReply at the primitive
     ▼
 OUTPUT
