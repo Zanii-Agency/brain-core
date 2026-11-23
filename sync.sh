@@ -51,7 +51,7 @@ CONTENT_HASH=$(
   | sort | xargs cat | md5 | awk '{print $1}'
 )
 cat > dist/VERSION <<EOF
-package: @sinanagency/brain-core
+package: @zanii/brain-core
 version: $PKG_VER
 git_sha: $SHA
 built_at: $TS

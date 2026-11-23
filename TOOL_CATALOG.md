@@ -1,4 +1,4 @@
-# Tool Catalog — @sinanagency/brain-core
+# Tool Catalog — @zanii/brain-core
 
 The master registry every Adapter picks from. One catalog, many bots.
 Adding a tool here makes it available to every Adapter. Each Adapter
@@ -7,7 +7,7 @@ chooses which tools to expose to its own Brain.
 ## The Contract
 
 ```ts
-import type { Tool } from "@sinanagency/brain-core";
+import type { Tool } from "@zanii/brain-core";
 
 interface Tool {
   name: string;                    // unique kebab_snake — used in tool_use
@@ -39,7 +39,7 @@ An Adapter picks tools like this:
 
 ```ts
 // nisria-techops/lib/adapter.ts
-import { selectTools, TOOL_CATALOG } from "@sinanagency/brain-core";
+import { selectTools, TOOL_CATALOG } from "@zanii/brain-core";
 
 export const SASA_TOOLS = selectTools(TOOL_CATALOG, {
   audience: { owner: "all", team: ["read", "write"] },   // money only for owner
